@@ -2,7 +2,7 @@ use clap::{Parser, Subcommand};
 
 mod commands;
 mod utils;
-use commands::{command::Command, day1::Day1, day2::Day2};
+use commands::{command::Command, day1::Day1, day2::Day2, day3::Day3};
 
 #[derive(Parser)]
 #[command(about = "Advent of Code 2024")]
@@ -22,6 +22,10 @@ enum Commands {
         #[arg(short, long, value_parser = part_value_parser)]
         part: u8,
     },
+    Day3 {
+        #[arg(short, long, value_parser = part_value_parser)]
+        part: u8,
+    },
 }
 
 fn main() {
@@ -29,6 +33,7 @@ fn main() {
     let result = match cli.command {
         Commands::Day1 { part } => Day1::new(part).execute(),
         Commands::Day2 { part } => Day2::new(part).execute(),
+        Commands::Day3 { part } => Day3::new(part).execute(),
     };
 
     println!("{}", result);

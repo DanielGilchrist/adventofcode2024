@@ -8,3 +8,4 @@ rust-version = "1.83.0"
 clap = { version = "4", features = [
   "derive",
 ] } # https://github.com/clap-rs/clap
+regex = "1"
