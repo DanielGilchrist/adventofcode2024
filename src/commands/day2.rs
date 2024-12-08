@@ -27,39 +27,11 @@ impl Day2 {
         let mut total = 0;
 
         for row in rows.iter() {
-            let mut safe = true;
-            let mut increasing = true;
-            let mut set_increasing = false;
+            let increasing = is_increasing(row);
+            let index = unsafe_index(row, increasing);
 
-            for pair in row.windows(2) {
-                let first = pair.first().expect("This should never happen");
-                let second = pair.last().unwrap_or(&-1);
-
-                if second == &-1 {
-                    continue;
-                }
-
-                if !set_increasing {
-                    if first > second {
-                        increasing = false;
-                    }
-
-                    set_increasing = true;
-                }
-
-                let diff = first - second;
-                if (increasing && diff > 0)
-                    || (!increasing && diff < 0)
-                    || diff == 0
-                    || diff.abs() > 3
-                {
-                    safe = false;
-                    continue;
-                }
-            }
-
-            if safe {
-                total += 1;
+            if index == -1 {
+                total += 1
             }
         }
 
@@ -69,6 +41,30 @@ impl Day2 {
     fn part2(&self, rows: &[Vec<i32>]) -> i32 {
         0
     }
+}
+
+fn is_increasing(slice: &[i32]) -> bool {
+    let first = slice[0];
+    let second = slice[1];
+
+    first <= second
+}
+
+fn unsafe_index(row: &[i32], increasing: bool) -> i32 {
+    for (i, n) in row.iter().enumerate() {
+        let first = n;
+        let second = match row.get(i + 1) {
+            Some(second) => second,
+            None => return -1,
+        };
+
+        let diff = first - second;
+        if (increasing && diff > 0) || (!increasing && diff < 0) || diff == 0 || diff.abs() > 3 {
+            return i as i32 + 1;
+        }
+    }
+
+    -1
 }
 
 fn split_input(input: &str) -> Vec<Vec<i32>> {
