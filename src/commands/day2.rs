@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+
 use crate::{commands::command::Command, utils::file::read_input};
 
 pub struct Day2(u8);
@@ -39,15 +41,59 @@ impl Day2 {
     }
 
     fn part2(&self, rows: &[Vec<i32>]) -> i32 {
-        0
+        let mut total = 0;
+
+        for row in rows.iter() {
+            let mut is_safe = false;
+
+            let increasing = is_increasing(row);
+            if unsafe_index(row, increasing) == -1 {
+                total += 1;
+                continue;
+            }
+
+            for i in 0..row.len() {
+                let unsafe_removed = remove_at_index(row, i);
+                let new_increasing = is_increasing(&unsafe_removed);
+                let new_index = unsafe_index(&unsafe_removed, new_increasing);
+
+                if new_index == -1 {
+                    total += 1;
+                    is_safe = true;
+                    break;
+                }
+            }
+
+            if is_safe {
+                continue;
+            }
+        }
+
+        total
     }
 }
 
-fn is_increasing(slice: &[i32]) -> bool {
-    let first = slice[0];
-    let second = slice[1];
+fn remove_at_index(vec: &[i32], index: usize) -> Vec<i32> {
+    vec.iter()
+        .enumerate()
+        .filter(|&(i, _)| i != index)
+        .map(|(_, &value)| value)
+        .collect()
+}
 
-    first <= second
+fn is_increasing(slice: &[i32]) -> bool {
+    let mut increasing_count = 0;
+    let mut decreasing_count = 0;
+
+    for window in slice.windows(2) {
+        match window[0].cmp(&window[1]) {
+            Ordering::Less => increasing_count += 1,
+            Ordering::Greater => decreasing_count += 1,
+            Ordering::Equal => (),
+        }
+    }
+
+    increasing_count > decreasing_count
 }
 
 fn unsafe_index(row: &[i32], increasing: bool) -> i32 {
